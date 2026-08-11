@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Sequences · Sec 1 Maths Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15172B;
+    --ink-soft:#2A2D4A;
+    --paper:#FBF8F1;
+    --paper-dim:#F1ECE0;
+    --coral:#FF6552;
+    --coral-dim:#E8523F;
+    --mint:#15B294;
+    --gold:#FFB627;
+    --violet:#7A6FF0;
+    --line:rgba(21,23,43,0.12);
+    --line-dark:rgba(251,248,241,0.16);
+    --paper-on-dark:#FBF8F1;
+
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --fs-hero: clamp(2.4rem, 6.4vw, 5rem);
+    --fs-h1: clamp(1.7rem, 3.8vw, 2.7rem);
+    --fs-h2: clamp(1.25rem, 2.2vw, 1.6rem);
+    --fs-body: clamp(0.98rem, 1.1vw, 1.1rem);
+    --fs-label: 0.76rem;
+    --topbar-h: 56px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; height:100%; }
+  body{
+    font-family:var(--font-body); color:var(--ink); background:var(--paper); overflow:hidden;
+    height:100%; touch-action:manipulation; -webkit-text-size-adjust:100%;
+  }
+  ::selection{ background:var(--gold); color:var(--ink); }
+
+  .deck{
+    height:100vh; height:100dvh; overflow-y:scroll; scroll-snap-type:y proximity; scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain;
+  }
+  .deck::-webkit-scrollbar{ display:none; }
+
+  .slide{
+    min-height:100vh; min-height:100dvh;
+    width:100%;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding: calc(var(--topbar-h) + 5vh) 7.5vw 6vh 7.5vw;
+    overflow:hidden;
+  }
+  .slide.dark{ background:var(--ink); color:var(--paper-on-dark); }
+  .slide.light{ background:var(--paper); color:var(--ink); }
+  .slide.dense{ justify-content:flex-start; padding-top:calc(var(--topbar-h) + 7vh); }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:var(--fs-label); letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--coral); font-weight:600; margin-bottom:0.9rem; display:flex; align-items:center; gap:0.6rem;
+  }
+  .eyebrow::before{ content:""; display:inline-block; width:22px; height:2px; background:var(--coral); }
+  .dark .eyebrow{ color:var(--gold); }
+  .dark .eyebrow::before{ background:var(--gold); }
+
+  h1,h2,h3{ font-family:var(--font-display); line-height:1.08; letter-spacing:-0.01em; }
+  h1{ font-size:var(--fs-hero); font-weight:700; }
+  h2{ font-size:var(--fs-h1); font-weight:700; margin-bottom:1rem; max-width:22ch; }
+  h3{ font-size:var(--fs-h2); font-weight:600; }
+  p{ font-size:var(--fs-body); line-height:1.55; max-width:56ch; }
+  .lede{ font-size:clamp(1rem,1.4vw,1.2rem); max-width:48ch; opacity:0.85; margin-top:0.5rem; }
+
+  .content-wrap{ opacity:0; transform:translateY(16px); transition:opacity 0.7s ease, transform 0.7s ease; max-width:1180px; width:100%; }
+  .slide.in-view .content-wrap{ opacity:1; transform:translateY(0); }
+  .stagger > *{ opacity:0; transform:translateY(12px); transition:opacity 0.55s ease, transform 0.55s ease; }
+  .slide.in-view .stagger > *{ opacity:1; transform:translateY(0); }
+  .stagger > *:nth-child(1){ transition-delay:0.04s; } .stagger > *:nth-child(2){ transition-delay:0.1s; }
+  .stagger > *:nth-child(3){ transition-delay:0.16s; } .stagger > *:nth-child(4){ transition-delay:0.22s; }
+  .stagger > *:nth-child(5){ transition-delay:0.28s; } .stagger > *:nth-child(6){ transition-delay:0.34s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .content-wrap, .stagger > *{ opacity:1 !important; transform:none !important; transition:none !important; }
+    html{ scroll-behavior:auto; }
+  }
+
+  /* ---------- Top bar (reserves its own space — nothing sits underneath it) ---------- */
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; height:var(--topbar-h); z-index:100;
+    background:var(--paper); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:0.7rem;
+    padding:0 3vw; box-shadow:0 1px 0 rgba(0,0,0,0.02);
+  }
+  body.on-dark .top-bar{ background:var(--ink); border-color:var(--line-dark); }
+
+  .tb-nav-btn{
+    flex-shrink:0; width:38px; height:38px; min-width:44px; min-height:44px; border-radius:50%;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem;
+    transition:all 0.15s ease; touch-action:manipulation;
+  }
+  .tb-nav-btn:hover{ background:var(--coral); color:#fff; border-color:var(--coral); }
+  body.on-dark .tb-nav-btn{ color:var(--paper-on-dark); border-color:var(--line-dark); }
+
+  .tb-counter{
+    flex-shrink:0; font-family:var(--font-mono); font-size:0.76rem; display:flex; align-items:center; gap:0.5rem;
+    color:var(--ink); white-space:nowrap;
+  }
+  body.on-dark .tb-counter{ color:var(--paper-on-dark); }
+  .tb-counter .track{ position:relative; width:38px; height:2px; background:var(--line); }
+  body.on-dark .tb-counter .track{ background:var(--line-dark); }
+  .tb-counter .fill{ position:absolute; left:0; top:0; height:2px; background:var(--coral); transition:width 0.4s ease; }
+
+  .tb-chips{
+    flex:1 1 auto; display:flex; gap:0.4rem; overflow-x:auto; scrollbar-width:none; padding:0 0.2rem;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tb-chips::-webkit-scrollbar{ display:none; }
+  .progress-item{
+    flex-shrink:0; display:flex; align-items:center; gap:0.4rem; font-family:var(--font-mono); font-size:0.68rem;
+    background:rgba(21,23,43,0.045); border:1px solid var(--line); border-radius:20px; padding:0.4rem 0.65rem;
+    cursor:pointer; transition:all 0.2s ease; color:var(--ink); white-space:nowrap; min-height:44px; touch-action:manipulation;
+  }
+  body.on-dark .progress-item{ background:rgba(251,248,241,0.06); border-color:var(--line-dark); color:var(--paper-on-dark); }
+  .progress-item:hover{ border-color:var(--coral); }
+  .progress-item .dot{
+    width:14px; height:14px; border-radius:50%; border:2px solid var(--coral); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:0.5rem; color:var(--ink);
+  }
+  body.on-dark .progress-item .dot{ border-color:var(--gold); }
+  .progress-item.complete .dot{ background:var(--mint); border-color:var(--mint); color:var(--ink); }
+
+  .tb-score{
+    flex-shrink:0; font-family:var(--font-mono); font-size:0.74rem; font-weight:700; color:var(--mint); white-space:nowrap;
+  }
+
+  @media (max-width: 720px){
+    .top-bar{ gap:0.45rem; padding:0 3vw; }
+    .tb-counter{ display:none; }
+    .work-layout, .scenario-layout{ grid-template-columns:1fr; }
+    .hook-grid, .quiz-grid{ grid-template-columns:1fr; }
+    .def-grid, .legend-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 980px) and (min-width:721px){
+    .work-layout, .scenario-layout{ grid-template-columns:1fr; }
+    .hook-grid, .quiz-grid{ grid-template-columns:1fr; }
+    .def-grid, .legend-grid{ grid-template-columns:1fr; }
+  }
+
+  /* ---------- Matchstick square motif ---------- */
+  .stick-row{ display:flex; }
+  .stick-square{ width:var(--sq,52px); height:var(--sq,52px); border:3px solid var(--coral); margin-left:-3px; flex-shrink:0; }
+  .stick-square:first-child{ margin-left:0; }
+  .dark .stick-square{ border-color:var(--gold); }
+  .stage{ display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem; }
+  .stage .stage-label{ font-family:var(--font-mono); font-size:0.8rem; opacity:0.75; }
+  .stage .stage-count{ font-family:var(--font-mono); font-weight:700; color:var(--coral); }
+  .dark .stage .stage-count{ color:var(--gold); }
+
+  /* ---------- Slide 1 : Title ---------- */
+  #s1 .stages-row{ display:flex; gap:clamp(1rem,2.6vw,2.4rem); margin-top:clamp(2rem,4vw,3rem); flex-wrap:wrap; }
+  .scroll-cue{
+    position:absolute; bottom:4vh; left:7.5vw; font-family:var(--font-mono); font-size:0.78rem; letter-spacing:0.1em;
+    text-transform:uppercase; opacity:0.7; display:flex; align-items:center; gap:0.5rem;
+  }
+  .scroll-cue span{ display:inline-block; animation:bob 1.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+
+  /* ---------- Onboarding legend ---------- */
+  .legend-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1.1rem; margin-top:1.3rem; max-width:900px; }
+  .legend-item{ display:flex; gap:0.8rem; align-items:flex-start; background:var(--paper-dim); border-radius:10px; padding:0.8rem 1rem; }
+  .legend-icon{ font-size:1.25rem; line-height:1; }
+  .legend-item p{ font-size:0.86rem; max-width:none; }
+  .legend-item strong{ display:block; font-size:0.86rem; margin-bottom:0.15rem; }
+  .pace-note{
+    margin-top:1.3rem; font-family:var(--font-mono); font-size:0.85rem; background:var(--ink); color:var(--paper);
+    display:inline-block; padding:0.6rem 1.1rem; border-radius:8px;
+  }
+
+  .lo-list{ display:flex; flex-direction:column; gap:0; max-width:64ch; margin-top:1.3rem; }
+  .lo-item{ display:flex; align-items:center; gap:1.3rem; padding:0.7rem 0; border-bottom:1px solid var(--line); }
+  .lo-item:first-child{ border-top:1px solid var(--line); }
+  .lo-marker{ display:flex; flex-shrink:0; }
+  .lo-marker .stick-square{ width:12px; height:12px; border-width:2px; }
+  .lo-text{ font-size:clamp(0.92rem,1.3vw,1.05rem); font-weight:500; }
+  .lo-tag{ font-family:var(--font-mono); font-size:0.72rem; color:var(--coral); opacity:0.9; min-width:2.2rem; }
+
+  /* ---------- Hook cards ---------- */
+  .hook-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:clamp(0.9rem,2vw,1.8rem); margin-top:1.6rem; max-width:1100px; }
+  .hook-card{ background:var(--ink-soft); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; gap:0.6rem; }
+  .hook-photo{ width:100%; aspect-ratio:4/3; object-fit:cover; display:block; background:var(--ink-soft); }
+  .hook-card .hook-body{ padding:0 1.2rem 1.2rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .hook-card p{ font-size:0.88rem; opacity:0.85; }
+  .hook-card .rule{ font-family:var(--font-mono); color:var(--gold); font-size:0.8rem; }
+
+  /* ---------- Vocab strip ---------- */
+  .term-strip{ display:flex; gap:clamp(0.6rem,1.6vw,1.3rem); margin:1.6rem 0 1.6rem; flex-wrap:wrap; align-items:center; }
+  .term-cell{ display:flex; flex-direction:column; align-items:center; gap:0.4rem; }
+  .term-cell .pos{ font-family:var(--font-mono); font-size:0.75rem; opacity:0.6; }
+  .term-cell .val{
+    font-family:var(--font-display); font-size:clamp(1.3rem,2.4vw,1.9rem); font-weight:700;
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:10px;
+    width:clamp(52px,5.6vw,72px); height:clamp(52px,5.6vw,72px); display:flex; align-items:center; justify-content:center;
+  }
+  .term-arrow{ font-family:var(--font-mono); color:var(--coral); font-size:0.8rem; text-align:center; }
+  .def-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; max-width:900px; margin-top:0.4rem; }
+  .def-card h4{ font-family:var(--font-mono); font-size:0.8rem; color:var(--coral); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.4rem; }
+  .def-card p{ font-size:0.88rem; }
+
+  /* ---------- Explore (non-scored) cards ---------- */
+  .pattern-cards{ display:flex; flex-direction:column; gap:0.8rem; max-width:760px; margin-top:1rem; }
+  .pattern-card{ border:1px solid var(--line); border-radius:14px; padding:1rem 1.3rem; cursor:pointer; transition:all 0.25s ease; }
+  .pattern-card:hover{ border-color:var(--coral); }
+  .pattern-card .seq{ font-family:var(--font-mono); font-size:clamp(1rem,1.8vw,1.3rem); font-weight:600; letter-spacing:0.02em; }
+  .pattern-card .hint-label{ font-family:var(--font-mono); font-size:0.75rem; opacity:0.55; margin-top:0.3rem; }
+  .pattern-card .answer{ max-height:0; overflow:hidden; opacity:0; transition:max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease; font-size:0.88rem; color:var(--coral-dim); }
+  .pattern-card.revealed .answer{ max-height:80px; opacity:1; margin-top:0.6rem; }
+  .pattern-card.revealed{ background:#FFF6F0; border-color:var(--coral); }
+
+  /* ---------- Exam-style structured questions (dot patterns) ---------- */
+  .structured-q{ border:1px solid var(--line); border-radius:16px; padding:1.4rem clamp(1rem,2.5vw,1.8rem); margin-bottom:1.4rem; max-width:1100px; }
+  .structured-q .sq-title{ font-family:var(--font-mono); font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--coral); margin-bottom:0.9rem; }
+  .diagram-row{ display:flex; align-items:flex-end; gap:clamp(1.4rem,3vw,2.6rem); flex-wrap:wrap; margin-bottom:1.2rem; }
+  .dot-stage{ position:relative; flex-shrink:0; }
+  .pdot{
+    position:absolute; width:13px; height:13px; border-radius:50%;
+    background:var(--coral); border:1.5px solid var(--ink);
+  }
+  .dot-stage-label{ font-family:var(--font-mono); font-size:0.72rem; text-align:center; opacity:0.65; margin-top:0.4rem; }
+  .dot-stage-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .sq-divider{ border:none; border-top:1px dashed var(--line); margin:1rem 0 1.1rem; }
+
+  /* ---------- Purpose box + formula anatomy ---------- */
+  .purpose-box{ display:flex; align-items:stretch; gap:1rem; margin-top:1.2rem; max-width:1000px; flex-wrap:wrap; }
+  .purpose-col{ flex:1; min-width:240px; background:var(--paper-dim); border-radius:14px; padding:1.1rem 1.3rem; border:1px solid var(--line); }
+  .purpose-col.highlight{ background:var(--ink); border-color:var(--ink); }
+  .purpose-col.highlight p{ color:var(--paper); opacity:0.92; }
+  .purpose-col.highlight strong{ color:var(--gold); }
+  .purpose-tag{ font-family:var(--font-mono); font-weight:700; font-size:0.85rem; margin-bottom:0.5rem; }
+  .purpose-col p{ font-size:0.88rem; }
+  .purpose-arrow{ display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:var(--coral); flex:0 0 auto; }
+
+  .formula-anatomy{
+    display:flex; align-items:flex-start; gap:clamp(0.5rem,1.5vw,1.2rem); margin-top:1.4rem; flex-wrap:wrap;
+    background:var(--paper-dim); border-radius:16px; padding:1.4rem clamp(1rem,3vw,2rem);
+  }
+  .fa-part{ display:flex; flex-direction:column; align-items:center; gap:0.5rem; min-width:96px; }
+  .fa-symbol{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(1.8rem,3.2vw,2.6rem);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px;
+    width:clamp(56px,6vw,76px); height:clamp(56px,6vw,76px); display:flex; align-items:center; justify-content:center;
+  }
+  .fa-label{ font-family:var(--font-mono); font-size:0.72rem; text-align:center; opacity:0.75; line-height:1.5; }
+  .fa-eq, .fa-op{ font-family:var(--font-display); font-size:1.8rem; font-weight:700; opacity:0.4; align-self:center; margin-top:0.6rem; }
+
+  .cheat-strip{
+    font-family:var(--font-mono); font-size:0.78rem; background:var(--paper-dim); border:1px solid var(--line);
+    border-radius:20px; padding:0.6rem 1.1rem; display:inline-block; margin-top:0.8rem; max-width:100%;
+  }
+
+  /* ---------- Worked demo (reveal steps) ---------- */
+  .work-layout{ display:grid; grid-template-columns:1fr 1.05fr; gap:clamp(1.6rem,3vw,3rem); align-items:start; max-width:1150px; }
+  .work-table{ border-collapse:collapse; margin-top:0.4rem; }
+  .work-table th, .work-table td{ font-family:var(--font-mono); padding:0.5rem 1.1rem 0.5rem 0; text-align:left; font-size:0.95rem; }
+  .work-table th{ font-size:0.74rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.6; font-weight:600; }
+  .work-table td{ border-top:1px solid var(--line); }
+  .diff-tag{ display:inline-block; margin-left:0.6rem; font-size:0.75rem; color:var(--coral); }
+
+  .step-list{ display:flex; flex-direction:column; gap:0.7rem; }
+  .rstep{ display:flex; gap:0.9rem; padding:0.75rem 1rem; border-radius:10px; background:var(--paper-dim); align-items:flex-start; }
+  .rstep.hidden-step{ display:none; }
+  .rstep .num{ font-family:var(--font-mono); font-weight:700; color:var(--paper); background:var(--ink); border-radius:50%; width:24px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.74rem; }
+  .rstep p{ font-size:0.88rem; }
+  .rstep .math{ font-family:var(--font-mono); font-weight:600; }
+  .k-d{ color:var(--coral); } .k-c{ color:var(--violet); }
+  .result-pill{
+    display:inline-flex; align-items:center; gap:0.5rem; font-family:var(--font-mono); font-weight:700; font-size:1.15rem;
+    background:var(--ink); color:var(--paper); padding:0.45rem 1rem; border-radius:8px; margin-top:0.5rem;
+  }
+  .result-pill.hidden-step{ display:none; }
+  .result-pill .k-d{ color:var(--gold); } .result-pill .k-c{ color:#B7AFFF; }
+  .reveal-next-btn{
+    font-family:var(--font-mono); font-size:0.82rem; font-weight:600; background:var(--ink); color:var(--paper);
+    border:none; border-radius:20px; padding:0.6rem 1.2rem; cursor:pointer; margin-top:0.3rem; min-height:44px;
+    touch-action:manipulation;
+  }
+  .dark .reveal-next-btn{ background:var(--gold); color:var(--ink); }
+  .reveal-next-btn:disabled{ opacity:0.6; cursor:default; }
+  .reveal-next-btn:hover:not(:disabled){ opacity:0.85; }
+
+  /* ---------- Tap-to-reveal big answer ---------- */
+  .formula-badge{
+    font-family:var(--font-mono); font-size:clamp(1.2rem,2.2vw,1.7rem); font-weight:700; color:var(--gold);
+    border:1px solid var(--line-dark); display:inline-block; padding:0.45rem 1.1rem; border-radius:10px;
+  }
+  .big-reveal{ display:flex; align-items:baseline; gap:1.1rem; margin-top:0.5rem; flex-wrap:wrap; }
+  .big-reveal .q{ font-size:1.05rem; opacity:0.85; }
+  .big-reveal .ans{ font-family:var(--font-display); font-weight:700; font-size:clamp(2.4rem,6vw,4.2rem); color:var(--coral); cursor:pointer; position:relative; }
+  .big-reveal .ans .hidden-val{ opacity:0; transition:opacity 0.5s ease; }
+  .big-reveal .ans.shown .hidden-val{ opacity:1; }
+  .big-reveal .ans .tap-hint{ position:absolute; left:0; bottom:-1.5rem; font-family:var(--font-mono); font-size:0.72rem; opacity:0.5; text-transform:none; letter-spacing:0; }
+  .big-reveal .ans.shown .tap-hint{ display:none; }
+  .working-note{ font-family:var(--font-mono); font-size:0.9rem; opacity:0.85; }
+
+  /* ---------- Real world ---------- */
+  .scenario-layout{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.6rem,3vw,3rem); align-items:center; max-width:1150px; }
+  .table-diagram{ display:flex; flex-direction:column; gap:0.8rem; }
+  .table-row{ display:flex; align-items:center; gap:0.5rem; }
+  .table-row .tables{ display:flex; }
+  .table-unit{ width:32px; height:32px; border:3px solid var(--mint); margin-left:-3px; }
+  .table-row .tables .table-unit:first-child{ margin-left:0; }
+  .table-row .seats{ font-family:var(--font-mono); font-size:0.8rem; opacity:0.75; }
+
+  /* ---------- Question engine ---------- */
+  .qsection-label{ font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.55; margin:1.6rem 0 0.6rem; }
+  .qgrid{ display:flex; flex-direction:column; gap:0.9rem; max-width:900px; }
+  .qblock{ border:1px solid var(--line); border-radius:14px; padding:1.1rem 1.3rem; background:var(--paper); position:relative; }
+  .dark .qblock{ background:var(--ink-soft); border-color:var(--line-dark); }
+  .qblock.solved{ border-color:var(--mint); border-width:1.5px; }
+  .qblock-with-photo{ display:flex; gap:1.1rem; padding:0; overflow:hidden; align-items:stretch; }
+  .qblock-with-photo .q-photo{ width:150px; min-width:120px; object-fit:cover; flex-shrink:0; }
+  .qblock-with-photo .qblock-body{ padding:1.1rem 1.3rem 1.1rem 0; flex:1; min-width:0; }
+  @media (max-width:640px){
+    .qblock-with-photo{ flex-direction:column; }
+    .qblock-with-photo .q-photo{ width:100%; height:120px; }
+    .qblock-with-photo .qblock-body{ padding:0 1.1rem 1.1rem; }
+  }
+  .qblock .qhead{ display:flex; justify-content:space-between; align-items:center; gap:0.8rem; margin-bottom:0.5rem; }
+  .qtag{ font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--coral); display:flex; align-items:center; gap:0.5rem; }
+  .dark .qtag{ color:var(--gold); }
+  .solved-icon{ display:none; width:19px; height:19px; border-radius:50%; background:var(--mint); color:var(--ink); font-size:0.68rem; align-items:center; justify-content:center; font-weight:700; }
+  .qblock.solved .solved-icon{ display:flex; }
+  .qhead-right{ display:flex; align-items:center; gap:0.5rem; }
+  .qprompt{ font-size:0.95rem; font-weight:500; margin-bottom:0.7rem; max-width:none; }
+  .hint-btn{
+    font-family:var(--font-mono); font-size:0.7rem; background:none; border:1px solid var(--line); border-radius:20px;
+    padding:0.5rem 0.8rem; cursor:pointer; color:inherit; opacity:0.75; white-space:nowrap; min-height:40px;
+    touch-action:manipulation;
+  }
+  .dark .hint-btn{ border-color:var(--line-dark); }
+  .hint-btn:hover{ opacity:1; }
+  .hint-box, .scaffold-box{
+    display:none; font-size:0.86rem; background:var(--paper-dim); border-left:3px solid var(--gold);
+    padding:0.65rem 0.85rem; border-radius:6px; margin:0.6rem 0;
+  }
+  .dark .hint-box, .dark .scaffold-box{ background:rgba(255,255,255,0.05); }
+  .hint-box.show, .scaffold-box.show{ display:block; }
+  .scaffold-box{ border-left-color:var(--coral); font-family:var(--font-mono); white-space:pre-line; line-height:1.65; font-size:0.83rem; }
+
+  .mcq-options{ display:flex; flex-wrap:wrap; gap:0.55rem; }
+  .opt-btn{
+    font-family:var(--font-mono); font-size:0.88rem; padding:0.65rem 1.1rem; border-radius:8px; min-height:44px;
+    border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer; transition:all 0.2s ease;
+    touch-action:manipulation;
+  }
+  .dark .opt-btn{ border-color:var(--line-dark); }
+  .opt-btn:hover:not(:disabled){ border-color:var(--coral); }
+  .opt-btn.correct{ background:var(--mint); border-color:var(--mint); color:var(--ink); }
+  .opt-btn.incorrect{ background:var(--coral); border-color:var(--coral); color:#fff; }
+  .opt-btn:disabled{ cursor:default; opacity:0.92; }
+
+  .formula-row, .numeric-row{ display:flex; align-items:center; gap:0.55rem; flex-wrap:wrap; font-family:var(--font-mono); font-size:0.95rem; margin:0.5rem 0; }
+  .formula-row input, .numeric-row input{
+    width:4.2rem; text-align:center; font-family:var(--font-mono); font-size:1rem; min-height:44px;
+    padding:0.38rem; border-radius:6px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+  }
+  .numeric-row input{ width:5.8rem; }
+  .dark .formula-row input, .dark .numeric-row input{ background:var(--ink); border-color:var(--line-dark); color:var(--paper); }
+  .check-btn{
+    font-family:var(--font-mono); font-size:0.8rem; font-weight:600; background:var(--ink); color:var(--paper);
+    border:none; border-radius:20px; padding:0.6rem 1.1rem; cursor:pointer; min-height:44px; touch-action:manipulation;
+  }
+  .dark .check-btn{ background:var(--gold); color:var(--ink); }
+  .check-btn:hover{ opacity:0.85; }
+  .check-btn:disabled{ opacity:0.6; cursor:default; }
+  .feedback{ font-size:0.85rem; font-weight:600; margin-top:0.45rem; min-height:1.2em; }
+  .feedback.good{ color:var(--mint); }
+  .feedback.bad{ color:var(--coral-dim); }
+  .dark .feedback.bad{ color:#FF9C8F; }
+
+  /* ---------- Recap ---------- */
+  .recap-list{ display:flex; flex-direction:column; gap:0; max-width:56ch; margin:1.3rem 0 1.6rem; }
+  .recap-item{ display:flex; align-items:center; gap:1rem; padding:0.65rem 0; border-bottom:1px solid var(--line-dark); font-size:0.95rem; }
+  .recap-check{ width:21px; height:21px; border-radius:50%; background:var(--line-dark); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:var(--ink); font-weight:700; flex-shrink:0; }
+  .recap-check.done{ background:var(--mint); }
+  .score-banner{
+    font-family:var(--font-mono); font-size:1rem; background:rgba(255,255,255,0.08); border:1px solid var(--line-dark);
+    display:inline-block; padding:0.7rem 1.3rem; border-radius:10px; margin-top:0.4rem;
+  }
+  .score-banner strong{ color:var(--mint); font-size:1.3em; }
+  .next-teaser{ font-family:var(--font-mono); font-size:0.82rem; opacity:0.65; margin-top:1rem; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="tb-nav-btn" id="prevBtn" aria-label="Previous slide">↑</button>
+  <button class="tb-nav-btn" id="nextBtn" aria-label="Next slide">↓</button>
+  <div class="tb-counter">
+    <span id="hudCurrent">01</span>
+    <div class="track"><div class="fill" id="hudFill" style="width:9%"></div></div>
+    <span id="hudTotal">12</span>
+  </div>
+  <div class="tb-chips" id="progressPanel"></div>
+  <div class="tb-score">Score: <span id="scoreDisplay">0 / 14</span></div>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1 — TITLE -->
+  <section class="slide dark" id="s1">
+    <div class="content-wrap">
+      <div class="eyebrow">Secondary 1 · Mathematics Workbook</div>
+      <h1>Number<br>Sequences</h1>
+      <p class="lede">Every pattern hides a rule. Find the rule, and you can predict any term — the 10th, the 50th, even the 1000th — without counting a single one. Work through this at your own pace.</p>
+      <div class="stages-row">
+        <div class="stage"><div class="stick-row" style="--sq:30px"><div class="stick-square"></div></div><div class="stage-label">n=1 → <span class="stage-count">4</span></div></div>
+        <div class="stage"><div class="stick-row" style="--sq:30px"><div class="stick-square"></div><div class="stick-square"></div></div><div class="stage-label">n=2 → <span class="stage-count">7</span></div></div>
+        <div class="stage"><div class="stick-row" style="--sq:30px"><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div></div><div class="stage-label">n=3 → <span class="stage-count">10</span></div></div>
+        <div class="stage"><div class="stick-row" style="--sq:30px"><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div></div><div class="stage-label">n=4 → <span class="stage-count">13</span></div></div>
+      </div>
+    </div>
+    <div class="scroll-cue"><span>↓</span> Scroll to begin</div>
+  </section>
+
+  <!-- SLIDE 2 — HOW THIS WORKS + LOs -->
+  <section class="slide light dense" id="s2">
+    <div class="content-wrap">
+      <div class="eyebrow">Before you start</div>
+      <h2>How this workbook works</h2>
+      <div class="legend-grid stagger">
+        <div class="legend-item"><span class="legend-icon">✅</span><div><strong>Multiple choice</strong><p>Tap the option you think is correct.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">✏️</span><div><strong>Type your answer</strong><p>Type a number into the box, then press Check.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">💡</span><div><strong>Need a hint?</strong><p>Tap the hint button any time you're stuck — no penalty.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">🔁</span><div><strong>Full working shown</strong><p>Get a question wrong twice and we'll show you the steps.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">⭐</span><div><strong>Track your progress</strong><p>Your checklist is on the right — tap any topic to jump there.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">🧠</span><div><strong>Mistakes are okay</strong><p>You don't need to be right the first time. Keep trying — that's how you learn.</p></div></div>
+      </div>
+      <div class="pace-note">⏱️ Aim for about 15–20 minutes — but go at your own pace.</div>
+
+      <div class="qsection-label" style="margin-top:2rem;">By the end, you can...</div>
+      <div class="lo-list stagger">
+        <div class="lo-item"><span class="lo-tag">01</span><div class="lo-marker"><div class="stick-square"></div></div><div class="lo-text">Recognise the pattern hidden in a sequence</div></div>
+        <div class="lo-item"><span class="lo-tag">02</span><div class="lo-marker"><div class="stick-square"></div><div class="stick-square"></div></div><div class="lo-text">Find the general term of a sequence</div></div>
+        <div class="lo-item"><span class="lo-tag">03</span><div class="lo-marker"><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div></div><div class="lo-text">Simplify the expression to get the nth term</div></div>
+        <div class="lo-item"><span class="lo-tag">04</span><div class="lo-marker"><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div></div><div class="lo-text">Calculate terms beyond what's given</div></div>
+        <div class="lo-item"><span class="lo-tag">05</span><div class="lo-marker"><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div><div class="stick-square"></div></div><div class="lo-text">Apply the nth term to real-world situations</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3 — HOOK -->
+  <section class="slide dark" id="s3">
+    <div class="content-wrap">
+      <div class="eyebrow">Spot the pattern</div>
+      <h2>Patterns are hiding in plain sight</h2>
+      <div class="hook-grid stagger">
+        <div class="hook-card">
+          <img class="hook-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Stepwell_staircase.JPG?width=500" alt="A staircase with repeating steps" loading="lazy">
+          <div class="hook-body">
+            <h3 style="font-size:1rem;">Staircase</h3>
+            <p>Each flight rises by the same number of steps as the one before.</p>
+            <div class="rule">rule: +1 step, every flight</div>
+          </div>
+        </div>
+        <div class="hook-card">
+          <img class="hook-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Honey_comb.jpg?width=500" alt="A honeycomb made of hexagonal cells" loading="lazy">
+          <div class="hook-body">
+            <h3 style="font-size:1rem;">Honeycomb</h3>
+            <p>Bees add a fixed number of new cells with every ring they build.</p>
+            <div class="rule">rule: +6 cells, per ring</div>
+          </div>
+        </div>
+        <div class="hook-card">
+          <img class="hook-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Empty_school_cafeteria.jpg?width=500" alt="Rows of joined tables in a school cafeteria" loading="lazy">
+          <div class="hook-body">
+            <h3 style="font-size:1rem;">Canteen tables</h3>
+            <p>Push tables together in a row and the seats grow by a constant amount.</p>
+            <div class="rule">rule: +2 seats, per table</div>
+          </div>
+        </div>
+      </div>
+      <p class="lede" style="margin-top:1.6rem;">Once you see the rule, you can predict what comes next — even the 100th step.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 4 — VOCAB -->
+  <section class="slide light" id="s4">
+    <div class="content-wrap">
+      <div class="eyebrow">The language of sequences</div>
+      <h2>Let's name the parts</h2>
+      <div class="term-strip stagger">
+        <div class="term-cell"><span class="pos">T1</span><span class="val">5</span></div>
+        <div class="term-arrow">+3</div>
+        <div class="term-cell"><span class="pos">T2</span><span class="val">8</span></div>
+        <div class="term-arrow">+3</div>
+        <div class="term-cell"><span class="pos">T3</span><span class="val">11</span></div>
+        <div class="term-arrow">+3</div>
+        <div class="term-cell"><span class="pos">T4</span><span class="val">14</span></div>
+        <div class="term-arrow">…</div>
+        <div class="term-cell"><span class="pos">Tn</span><span class="val" style="color:var(--coral);">?</span></div>
+      </div>
+      <div class="def-grid stagger">
+        <div class="def-card"><h4>Term</h4><p>Each individual number in a sequence. 5, 8, 11 and 14 are all terms.</p></div>
+        <div class="def-card"><h4>Position</h4><p>Where a term sits in the sequence — 1st, 2nd, 3rd, and so on.</p></div>
+        <div class="def-card"><h4>T<sub>n</sub></h4><p>The term in position <em>n</em>. It's the formula that gives you any term you ask for.</p></div>
+      </div>
+      <div class="qsection-label">Quick check — tap to try</div>
+      <div class="pattern-cards">
+        <div class="pattern-card" data-reveal>
+          <div class="seq">Sequence: 5, 8, 11, 14 &nbsp;—&nbsp; Which term is T<sub>3</sub>?</div>
+          <div class="hint-label">tap to reveal the answer</div>
+          <div class="answer">T<sub>3</sub> = 11, because 11 is the 3rd number in the sequence — it's in position 3.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5 — LO1 -->
+  <section class="slide light dense" id="s5">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — recognise the pattern</div>
+      <h2>What's the rule?</h2>
+      <p class="lede">Tap a card to check your thinking, then try the practice questions below.</p>
+      <div class="pattern-cards stagger">
+        <div class="pattern-card" data-reveal>
+          <div class="seq">4, &nbsp;7, &nbsp;10, &nbsp;13, &hellip;</div>
+          <div class="hint-label">tap to reveal the rule</div>
+          <div class="answer">Add 3 each time. This is called the <strong>common difference</strong>, d = 3.</div>
+        </div>
+        <div class="pattern-card" data-reveal>
+          <div class="seq">20, &nbsp;17, &nbsp;14, &nbsp;11, &hellip;</div>
+          <div class="hint-label">tap to reveal the rule</div>
+          <div class="answer">Subtract 3 each time. A negative common difference, d = &minus;3.</div>
+        </div>
+      </div>
+
+      <div class="qsection-label">Practice — Multiple choice</div>
+      <div class="qgrid">
+        <div class="qblock" id="block-q1">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 1</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q1">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 5, 9, 13, 17 — what is the common difference, d?</p>
+          <div class="hint-box" id="hint-q1">Subtract the 1st term from the 2nd term: 9 − 5 = ?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="q1" data-correct="false">3</button>
+            <button class="opt-btn" data-qid="q1" data-correct="true">4</button>
+            <button class="opt-btn" data-qid="q1" data-correct="false">5</button>
+            <button class="opt-btn" data-qid="q1" data-correct="false">9</button>
+          </div>
+          <div class="feedback" id="fb-q1"></div>
+          <div class="scaffold-box" id="scaffold-q1">Step 1: 9 − 5 = 4
+Step 2: 13 − 9 = 4 → same difference, so it's constant
+Step 3: the common difference d = 4</div>
+        </div>
+
+        <div class="qblock" id="block-q2">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 2</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q2">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 30, 25, 20, 15 — what is the common difference, d?</p>
+          <div class="hint-box" id="hint-q2">The terms are getting smaller. Subtract: 25 − 30 = ?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="q2" data-correct="true">−5</button>
+            <button class="opt-btn" data-qid="q2" data-correct="false">5</button>
+            <button class="opt-btn" data-qid="q2" data-correct="false">−10</button>
+            <button class="opt-btn" data-qid="q2" data-correct="false">15</button>
+          </div>
+          <div class="feedback" id="fb-q2"></div>
+          <div class="scaffold-box" id="scaffold-q2">Step 1: 25 − 30 = −5
+Step 2: 20 − 25 = −5 → same difference
+Step 3: d = −5 (negative, because the terms decrease)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6 — MEET THE FORMULA (purpose + anatomy) -->
+  <section class="slide light dense" id="s6">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — find &amp; simplify the nth term</div>
+      <h2>Why bother finding a formula?</h2>
+
+      <div class="purpose-box stagger">
+        <div class="purpose-col">
+          <div class="purpose-tag">😩 The slow way</div>
+          <p>"What's the 50th term of 5, 8, 11, 14, …?" &nbsp;You'd have to write out all 50 terms, one by one, just to answer one question.</p>
+        </div>
+        <div class="purpose-arrow">→</div>
+        <div class="purpose-col highlight">
+          <div class="purpose-tag">⚡ The smart way</div>
+          <p>Turn the sequence into a <strong>formula</strong>, T<sub>n</sub>. Then finding the 50th term — or the 500th — takes one substitution. No counting.</p>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top:1.4rem;">That formula always looks like this. Let's break down exactly what each letter means before we build one.</p>
+
+      <div class="formula-anatomy stagger">
+        <div class="fa-part">
+          <span class="fa-symbol">T<sub>n</sub></span>
+          <span class="fa-label">the term you're<br>looking for<br><em>(the answer)</em></span>
+        </div>
+        <span class="fa-eq">=</span>
+        <div class="fa-part">
+          <span class="fa-symbol k-d">d</span>
+          <span class="fa-label">common difference<br><em>(how much each<br>term changes by)</em></span>
+        </div>
+        <span class="fa-op">×</span>
+        <div class="fa-part">
+          <span class="fa-symbol">n</span>
+          <span class="fa-label">the position<br>you want<br><em>(1st, 2nd… or 50th)</em></span>
+        </div>
+        <span class="fa-op">+</span>
+        <div class="fa-part">
+          <span class="fa-symbol k-c">c</span>
+          <span class="fa-label">a constant<br><em>(adjusts where the<br>sequence starts)</em></span>
+        </div>
+      </div>
+
+      <div class="qsection-label">Quick check — tap to try</div>
+      <div class="pattern-cards">
+        <div class="pattern-card" data-reveal>
+          <div class="seq">In T<sub>n</sub> = 3n + 2, which part is the common difference, d?</div>
+          <div class="hint-label">tap to reveal</div>
+          <div class="answer">d = 3 — it's the number multiplied by n, because it's how much the sequence grows every time the position goes up by 1.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7 — LO2/3 worked walkthrough -->
+  <section class="slide light dense" id="s7">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — find &amp; simplify the nth term</div>
+      <h2>Building T<sub>n</sub> = dn + c, step by step</h2>
+      <p class="lede">Tap "Show next step" to walk through it yourself — go at your own pace.</p>
+
+      <div class="work-layout" style="margin-top:1rem;">
+        <div>
+          <table class="work-table"><tr><th>Position (n)</th><td>1</td><td>2</td><td>3</td><td>4</td></tr><tr><th>Term</th><td>5</td><td>8</td><td>11</td><td>14</td></tr></table>
+          <div class="diff-tag">d = +3</div>
+        </div>
+        <div>
+          <div class="step-list">
+            <div class="rstep" data-group="demoA"><span class="num">1</span><p><strong>Find d</strong> — how much each term changes by: 8&minus;5 = 3, 11&minus;8 = 3. Same both times, so d = <span class="math k-d">3</span>.</p></div>
+            <div class="rstep hidden-step" data-group="demoA"><span class="num">2</span><p><strong>Start the formula.</strong> Since every term grows by 3 for each step in n, write <span class="math k-d">T<sub>n</sub> = 3n</span> + c. The "+ c" is still unknown — that's what we solve next.</p></div>
+            <div class="rstep hidden-step" data-group="demoA"><span class="num">3</span><p><strong>Find c</strong> — plug in a term you know: n=1 gives T<sub>1</sub>=5. So <span class="math">3(1)+c=5</span> → <span class="math k-c">c = 2</span>. c is the adjustment that makes the formula match the real starting point.</p></div>
+            <div class="rstep hidden-step" data-group="demoA"><span class="num">4</span><p><strong>Check it.</strong> Try n=2: 3(2)+2 = 8 ✓ — matches the table. Now n can be <em>any</em> position, even 50.</p></div>
+          </div>
+          <button class="reveal-next-btn" data-group="demoA">Show next step →</button>
+          <div class="result-pill hidden-step" data-group="demoA-result">T<sub>n</sub> = <span class="k-d">3</span>n + <span class="k-c">2</span></div>
+        </div>
+      </div>
+
+      <div class="work-layout" style="margin-top:1.6rem;">
+        <div>
+          <table class="work-table"><tr><th>Position (n)</th><td>1</td><td>2</td><td>3</td><td>4</td></tr><tr><th>Term</th><td>12</td><td>9</td><td>6</td><td>3</td></tr></table>
+          <div class="diff-tag">d = &minus;3</div>
+        </div>
+        <div>
+          <div class="step-list">
+            <div class="rstep" data-group="demoB"><span class="num">1</span><p><strong>Find d.</strong> The terms are shrinking: 9&minus;12 = &minus;3, 6&minus;9 = &minus;3. So d = <span class="math k-d">&minus;3</span> — negative, because the sequence decreases.</p></div>
+            <div class="rstep hidden-step" data-group="demoB"><span class="num">2</span><p><strong>Start the formula:</strong> <span class="math k-d">T<sub>n</sub> = &minus;3n</span> + c.</p></div>
+            <div class="rstep hidden-step" data-group="demoB"><span class="num">3</span><p><strong>Find c</strong> using n=1, T<sub>1</sub>=12: <span class="math">&minus;3(1)+c=12</span> → <span class="math k-c">c = 15</span>.</p></div>
+            <div class="rstep hidden-step" data-group="demoB"><span class="num">4</span><p><strong>Check it.</strong> Try n=3: &minus;3(3)+15 = 6 ✓ — matches the table.</p></div>
+          </div>
+          <button class="reveal-next-btn" data-group="demoB">Show next step →</button>
+          <div class="result-pill hidden-step" data-group="demoB-result">T<sub>n</sub> = <span class="k-c">15</span> &minus; <span class="k-d">3</span>n</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8 — LO2/3 practice -->
+  <section class="slide light dense" id="s8">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — find &amp; simplify the nth term</div>
+      <h2>Your turn: fill in the formula</h2>
+      <p class="lede">For each sequence, work out d and c, then type them into T<sub>n</sub> = ⬜n + ⬜.</p>
+      <div class="cheat-strip">T<sub>n</sub> = d n + c &nbsp;·&nbsp; <span class="k-d">d</span> = common difference (jump between terms) &nbsp;·&nbsp; <span class="k-c">c</span> = constant that fixes the start &nbsp;·&nbsp; n = the position you're working out</div>
+      <div class="qgrid" style="margin-top:1rem;">
+
+        <div class="qblock" id="block-q3">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 3</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q3">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 6, 10, 14, 18</p>
+          <div class="hint-box" id="hint-q3">First find d (the common difference), then substitute n=1 into Tn = dn + c to find c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q3-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q3-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q3" data-d="4" data-c="2">Check</button>
+          </div>
+          <div class="feedback" id="fb-q3"></div>
+          <div class="scaffold-box" id="scaffold-q3">Step 1: d = 10 − 6 = 4
+Step 2: Tn = 4n + c
+Step 3: n=1, T1=6 → 4(1)+c=6 → c=2
+Answer: Tn = 4n + 2</div>
+        </div>
+
+        <div class="qblock" id="block-q4">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 4</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q4">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 20, 17, 14, 11 &nbsp;(getting smaller — d will be negative)</p>
+          <div class="hint-box" id="hint-q4">Find d first (it will be negative since terms decrease), then use n=1 to find c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q4-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q4-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q4" data-d="-3" data-c="23">Check</button>
+          </div>
+          <div class="feedback" id="fb-q4"></div>
+          <div class="scaffold-box" id="scaffold-q4">Step 1: d = 17 − 20 = −3
+Step 2: Tn = −3n + c
+Step 3: n=1, T1=20 → −3(1)+c=20 → c=23
+Answer: Tn = −3n + 23</div>
+        </div>
+
+        <div class="qblock" id="block-q5">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 5 (stretch)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q5">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 8, 15, 22, 29</p>
+          <div class="hint-box" id="hint-q5">Find the common difference first, then substitute n=1 to solve for c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q5-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q5-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q5" data-d="7" data-c="1">Check</button>
+          </div>
+          <div class="feedback" id="fb-q5"></div>
+          <div class="scaffold-box" id="scaffold-q5">Step 1: d = 15 − 8 = 7
+Step 2: Tn = 7n + c
+Step 3: n=1, T1=8 → 7(1)+c=8 → c=1
+Answer: Tn = 7n + 1</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9 — LO4 -->
+  <section class="slide dark dense" id="s9">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — go beyond the given terms</div>
+      <h2>You don't need to count all the way to 50</h2>
+      <div class="formula-badge">T<sub>n</sub> = 3n + 2</div>
+      <div class="big-reveal">
+        <span class="q">What is the 50th term?</span>
+        <span class="ans" id="beyondAns" data-reveal><span class="hidden-val">152</span><span class="tap-hint">tap to reveal</span></span>
+      </div>
+      <p class="working-note">T<sub>50</sub> = 3(50) + 2 = 152 — just one substitution, no listing required.</p>
+
+      <div class="qsection-label">Practice — type your answer</div>
+      <div class="qgrid">
+        <div class="qblock" id="block-q6">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 6</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q6">💡 Hint</button></div></div>
+          <p class="qprompt">If T<sub>n</sub> = 4n + 3, what is T<sub>10</sub>?</p>
+          <div class="hint-box" id="hint-q6">Substitute n = 10 into the formula Tn = 4n + 3.</div>
+          <div class="numeric-row">
+            T<sub>10</sub> = <input type="text" inputmode="numeric" id="q6-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="q6" data-ans="43">Check</button>
+          </div>
+          <div class="feedback" id="fb-q6"></div>
+          <div class="scaffold-box" id="scaffold-q6">T10 = 4(10) + 3 = 40 + 3 = 43</div>
+        </div>
+
+        <div class="qblock" id="block-q7a">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 7a</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q7a">💡 Hint</button></div></div>
+          <p class="qprompt">Sequence: 9, 13, 17, 21 — find T<sub>n</sub></p>
+          <div class="hint-box" id="hint-q7a">Same method as before: find d, then substitute n=1 to find c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q7a-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q7a-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q7a" data-d="4" data-c="5">Check</button>
+          </div>
+          <div class="feedback" id="fb-q7a"></div>
+          <div class="scaffold-box" id="scaffold-q7a">Step 1: d = 13 − 9 = 4
+Step 2: Tn = 4n + c
+Step 3: n=1, T1=9 → 4(1)+c=9 → c=5
+Answer: Tn = 4n + 5</div>
+        </div>
+
+        <div class="qblock" id="block-q7b">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 7b</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q7b">💡 Hint</button></div></div>
+          <p class="qprompt">Using T<sub>n</sub> = 4n + 5 from 7a, what is T<sub>25</sub>?</p>
+          <div class="hint-box" id="hint-q7b">Substitute n = 25 into Tn = 4n + 5.</div>
+          <div class="numeric-row">
+            T<sub>25</sub> = <input type="text" inputmode="numeric" id="q7b-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="q7b" data-ans="105">Check</button>
+          </div>
+          <div class="feedback" id="fb-q7b"></div>
+          <div class="scaffold-box" id="scaffold-q7b">T25 = 4(25) + 5 = 100 + 5 = 105</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10 — LO5 -->
+  <section class="slide dark dense" id="s10">
+    <div class="content-wrap">
+      <div class="eyebrow">I can — apply it to real life</div>
+      <h2>The canteen table problem</h2>
+      <div class="scenario-layout">
+        <div class="scenario-text">
+          <p class="lede">Square tables are pushed together in a row for a class party. One table seats 4. Two joined tables seat 6. Three seat 8.</p>
+          <p class="lede" style="margin-top:0.6rem;"><strong>How many classmates can sit at 12 joined tables?</strong></p>
+          <div class="formula-badge" style="margin-top:0.8rem;">T<sub>n</sub> = 2n + 2</div>
+          <div class="big-reveal">
+            <span class="q">T<sub>12</sub> =</span>
+            <span class="ans" id="canteenAns" data-reveal><span class="hidden-val">26</span><span class="tap-hint">tap to reveal</span></span>
+          </div>
+        </div>
+        <div class="table-diagram">
+          <div class="table-row"><div class="tables"><div class="table-unit"></div></div><span class="seats">1 table → 4 seats</span></div>
+          <div class="table-row"><div class="tables"><div class="table-unit"></div><div class="table-unit"></div></div><span class="seats">2 tables → 6 seats</span></div>
+          <div class="table-row"><div class="tables"><div class="table-unit"></div><div class="table-unit"></div><div class="table-unit"></div></div><span class="seats">3 tables → 8 seats</span></div>
+        </div>
+      </div>
+
+      <div class="qsection-label">Practice — a new scenario</div>
+      <div class="qgrid">
+        <div class="qblock qblock-with-photo" id="block-q8a">
+          <img class="q-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Bardwell_Auditorium_-_Dana_Hall_School_-_Wellesley,_MA_-_DSC03038.JPG?width=420" alt="Rows of chairs in a school hall" loading="lazy">
+          <div class="qblock-body">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8a</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q8a">💡 Hint</button></div></div>
+          <p class="qprompt">School hall chairs: row 1 has 8 chairs, row 2 has 14, row 3 has 20, row 4 has 26. Find T<sub>n</sub> for the number of chairs in row n.</p>
+          <div class="hint-box" id="hint-q8a">Find the common difference between rows, then use n=1 to find c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q8a-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q8a-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q8a" data-d="6" data-c="2">Check</button>
+          </div>
+          <div class="feedback" id="fb-q8a"></div>
+          <div class="scaffold-box" id="scaffold-q8a">Step 1: d = 14 − 8 = 6
+Step 2: Tn = 6n + c
+Step 3: n=1, T1=8 → 6(1)+c=8 → c=2
+Answer: Tn = 6n + 2</div>
+          </div>
+        </div>
+
+        <div class="qblock" id="block-q8b">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8b</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q8b">💡 Hint</button></div></div>
+          <p class="qprompt">Using T<sub>n</sub> = 6n + 2, how many chairs are in row 20?</p>
+          <div class="hint-box" id="hint-q8b">Substitute n = 20 into Tn = 6n + 2.</div>
+          <div class="numeric-row">
+            T<sub>20</sub> = <input type="text" inputmode="numeric" id="q8b-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="q8b" data-ans="122">Check</button>
+          </div>
+          <div class="feedback" id="fb-q8b"></div>
+          <div class="scaffold-box" id="scaffold-q8b">T20 = 6(20) + 2 = 120 + 2 = 122</div>
+        </div>
+
+        <div class="qblock" id="block-q9">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q9">💡 Hint</button></div></div>
+          <p class="qprompt">Why is it useful to find the formula for T<sub>n</sub>, instead of just listing terms one by one?</p>
+          <div class="hint-box" id="hint-q9">Think about how long it would take to list 100 terms by hand, one at a time.</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="q9" data-correct="false">It isn't useful — listing is easier</button>
+            <button class="opt-btn" data-qid="q9" data-correct="true">It lets us find any term instantly, without counting one by one</button>
+            <button class="opt-btn" data-qid="q9" data-correct="false">It only works for the first 4 terms</button>
+          </div>
+          <div class="feedback" id="fb-q9"></div>
+          <div class="scaffold-box" id="scaffold-q9">Listing every term to find, say, the 100th term would take forever. The formula Tn = dn + c lets us jump straight to any term by substituting its position, n. That's the real power of finding the nth term.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11 — EXAM-STYLE STRUCTURED QUESTIONS -->
+  <section class="slide light dense" id="s11">
+    <div class="content-wrap">
+      <div class="eyebrow">Putting it all together</div>
+      <h2>Exam-style questions</h2>
+      <p class="lede">These questions combine everything: spotting the pattern, finding T<sub>n</sub>, working beyond the given terms, and explaining your reasoning — just like a real exam question.</p>
+
+      <!-- Structured question 1: X pattern -->
+      <div class="structured-q" style="margin-top:1.4rem;">
+        <div class="sq-title">Question 1 · The diagram shows a sequence of patterns</div>
+        <div class="diagram-row">
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:86px;">
+              <div class="pdot" style="left:36px; top:36px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 1</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:86px;">
+              <div class="pdot" style="left:18px; top:18px;"></div>
+              <div class="pdot" style="left:54px; top:18px;"></div>
+              <div class="pdot" style="left:36px; top:36px;"></div>
+              <div class="pdot" style="left:18px; top:54px;"></div>
+              <div class="pdot" style="left:54px; top:54px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 2</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:86px;">
+              <div class="pdot" style="left:0px; top:0px;"></div>
+              <div class="pdot" style="left:72px; top:0px;"></div>
+              <div class="pdot" style="left:18px; top:18px;"></div>
+              <div class="pdot" style="left:54px; top:18px;"></div>
+              <div class="pdot" style="left:36px; top:36px;"></div>
+              <div class="pdot" style="left:18px; top:54px;"></div>
+              <div class="pdot" style="left:54px; top:54px;"></div>
+              <div class="pdot" style="left:0px; top:72px;"></div>
+              <div class="pdot" style="left:72px; top:72px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 3</div>
+          </div>
+        </div>
+
+        <div class="qgrid">
+          <div class="qblock" id="block-sq1a">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(a)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq1a">💡 Hint</button></div></div>
+            <p class="qprompt">If you drew Pattern 4, how many circles would it have?</p>
+            <div class="hint-box" id="hint-sq1a">Look at how many circles are added each time you go up a pattern.</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq1a-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq1a" data-ans="13">Check</button></div>
+            <div class="feedback" id="fb-sq1a"></div>
+            <div class="scaffold-box" id="scaffold-sq1a">Pattern 1→2→3 goes 1, 5, 9 — adding 4 each time.
+Pattern 4 = 9 + 4 = 13</div>
+          </div>
+
+          <div class="qblock" id="block-sq1b">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(b)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq1b">💡 Hint</button></div></div>
+            <p class="qprompt">Work out the number of circles in Pattern 6.</p>
+            <div class="hint-box" id="hint-sq1b">Keep adding 4 for each new pattern, or use your formula from part (c) once you've found it.</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq1b-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq1b" data-ans="21">Check</button></div>
+            <div class="feedback" id="fb-sq1b"></div>
+            <div class="scaffold-box" id="scaffold-sq1b">1, 5, 9, 13, 17, 21 — Pattern 6 = 21
+(or: 4(6) − 3 = 21)</div>
+          </div>
+
+          <div class="qblock" id="block-sq1c">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(c)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq1c">💡 Hint</button></div></div>
+            <p class="qprompt">Write down an expression, in terms of n, for the number of circles in Pattern n.</p>
+            <div class="hint-box" id="hint-sq1c">Find d (the common difference) first, then use n=1 to find c.</div>
+            <div class="formula-row">
+              T<sub>n</sub> = <input type="text" inputmode="numeric" id="sq1c-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="sq1c-c" placeholder="c">
+              <button class="check-btn" data-check="formula" data-qid="sq1c" data-d="4" data-c="-3">Check</button>
+            </div>
+            <div class="feedback" id="fb-sq1c"></div>
+            <div class="scaffold-box" id="scaffold-sq1c">d = 5 − 1 = 4
+n=1, T1=1 → 4(1)+c=1 → c=−3
+Answer: Tn = 4n − 3</div>
+          </div>
+
+          <div class="qblock" id="block-sq1d">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(d)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq1d">💡 Hint</button></div></div>
+            <p class="qprompt">Explain why you cannot make a pattern with exactly 66 circles.</p>
+            <div class="hint-box" id="hint-sq1d">Set 4n − 3 = 66 and solve for n. Is n a whole number?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 66 is too big a number</button>
+              <button class="opt-btn" data-qid="sq1d" data-correct="true">Solving 4n − 3 = 66 gives n = 17.25, which isn't a whole number</button>
+              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 66 is an odd number</button>
+            </div>
+            <div class="feedback" id="fb-sq1d"></div>
+            <div class="scaffold-box" id="scaffold-sq1d">4n − 3 = 66 → 4n = 69 → n = 17.25
+Since n must be a whole number (a pattern position), 66 circles is impossible.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Structured question 2: L pattern -->
+      <div class="structured-q">
+        <div class="sq-title">Question 2 · The diagram shows a sequence of patterns</div>
+        <div class="diagram-row">
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:50px; height:50px;">
+              <div class="pdot" style="left:0px; top:0px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 1</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:50px; height:50px;">
+              <div class="pdot" style="left:0px; top:0px;"></div>
+              <div class="pdot" style="left:18px; top:0px;"></div>
+              <div class="pdot" style="left:0px; top:18px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 2</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:50px; height:50px;">
+              <div class="pdot" style="left:0px; top:0px;"></div>
+              <div class="pdot" style="left:18px; top:0px;"></div>
+              <div class="pdot" style="left:36px; top:0px;"></div>
+              <div class="pdot" style="left:0px; top:18px;"></div>
+              <div class="pdot" style="left:0px; top:36px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 3</div>
+          </div>
+        </div>
+
+        <div class="qgrid">
+          <div class="qblock" id="block-sq2a">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(a)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq2a">💡 Hint</button></div></div>
+            <p class="qprompt">If you drew Pattern 4, how many circles would it have?</p>
+            <div class="hint-box" id="hint-sq2a">How many circles are added each time?</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq2a-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq2a" data-ans="7">Check</button></div>
+            <div class="feedback" id="fb-sq2a"></div>
+            <div class="scaffold-box" id="scaffold-sq2a">1, 3, 5 — adding 2 each time.
+Pattern 4 = 5 + 2 = 7</div>
+          </div>
+
+          <div class="qblock" id="block-sq2b">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(b)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq2b">💡 Hint</button></div></div>
+            <p class="qprompt">Work out the number of circles in Pattern 7.</p>
+            <div class="hint-box" id="hint-sq2b">Keep adding 2, or use your formula from part (c).</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq2b-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq2b" data-ans="13">Check</button></div>
+            <div class="feedback" id="fb-sq2b"></div>
+            <div class="scaffold-box" id="scaffold-sq2b">1, 3, 5, 7, 9, 11, 13 — Pattern 7 = 13
+(or: 2(7) − 1 = 13)</div>
+          </div>
+
+          <div class="qblock" id="block-sq2c">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(c)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq2c">💡 Hint</button></div></div>
+            <p class="qprompt">Write down an expression, in terms of n, for the number of circles in Pattern n.</p>
+            <div class="hint-box" id="hint-sq2c">Find d first, then use n=1 to find c.</div>
+            <div class="formula-row">
+              T<sub>n</sub> = <input type="text" inputmode="numeric" id="sq2c-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="sq2c-c" placeholder="c">
+              <button class="check-btn" data-check="formula" data-qid="sq2c" data-d="2" data-c="-1">Check</button>
+            </div>
+            <div class="feedback" id="fb-sq2c"></div>
+            <div class="scaffold-box" id="scaffold-sq2c">d = 3 − 1 = 2
+n=1, T1=1 → 2(1)+c=1 → c=−1
+Answer: Tn = 2n − 1</div>
+          </div>
+
+          <div class="qblock" id="block-sq2d">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(d)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq2d">💡 Hint</button></div></div>
+            <p class="qprompt">Explain why you cannot make a pattern with exactly 50 circles.</p>
+            <div class="hint-box" id="hint-sq2d">Set 2n − 1 = 50 and solve for n. Is n a whole number?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="sq2d" data-correct="false">Because 50 is too big a number</button>
+              <button class="opt-btn" data-qid="sq2d" data-correct="false">Because the pattern only has 3 stages</button>
+              <button class="opt-btn" data-qid="sq2d" data-correct="true">Solving 2n − 1 = 50 gives n = 25.5, which isn't a whole number</button>
+            </div>
+            <div class="feedback" id="fb-sq2d"></div>
+            <div class="scaffold-box" id="scaffold-sq2d">2n − 1 = 50 → 2n = 51 → n = 25.5
+Since n must be a whole number, 50 circles is impossible.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Structured question 3: T pattern -->
+      <div class="structured-q">
+        <div class="sq-title">Question 3 · The diagram shows a sequence of patterns</div>
+        <div class="diagram-row">
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:50px;">
+              <div class="pdot" style="left:36px; top:0px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 1</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:50px;">
+              <div class="pdot" style="left:18px; top:0px;"></div>
+              <div class="pdot" style="left:36px; top:0px;"></div>
+              <div class="pdot" style="left:54px; top:0px;"></div>
+              <div class="pdot" style="left:36px; top:18px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 2</div>
+          </div>
+          <div class="dot-stage-wrap">
+            <div class="dot-stage" style="width:86px; height:50px;">
+              <div class="pdot" style="left:0px; top:0px;"></div>
+              <div class="pdot" style="left:18px; top:0px;"></div>
+              <div class="pdot" style="left:36px; top:0px;"></div>
+              <div class="pdot" style="left:54px; top:0px;"></div>
+              <div class="pdot" style="left:72px; top:0px;"></div>
+              <div class="pdot" style="left:36px; top:18px;"></div>
+              <div class="pdot" style="left:36px; top:36px;"></div>
+            </div>
+            <div class="dot-stage-label">Pattern 3</div>
+          </div>
+        </div>
+
+        <div class="qgrid">
+          <div class="qblock" id="block-sq3a">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(a)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq3a">💡 Hint</button></div></div>
+            <p class="qprompt">If you drew Pattern 4, how many circles would it have?</p>
+            <div class="hint-box" id="hint-sq3a">How many circles are added each time?</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq3a-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq3a" data-ans="10">Check</button></div>
+            <div class="feedback" id="fb-sq3a"></div>
+            <div class="scaffold-box" id="scaffold-sq3a">1, 4, 7 — adding 3 each time.
+Pattern 4 = 7 + 3 = 10</div>
+          </div>
+
+          <div class="qblock" id="block-sq3b">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(b)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq3b">💡 Hint</button></div></div>
+            <p class="qprompt">Work out the number of circles in Pattern 8.</p>
+            <div class="hint-box" id="hint-sq3b">Keep adding 3, or use your formula from part (c).</div>
+            <div class="numeric-row"><input type="text" inputmode="numeric" id="sq3b-ans" placeholder="answer"><button class="check-btn" data-check="numeric" data-qid="sq3b" data-ans="22">Check</button></div>
+            <div class="feedback" id="fb-sq3b"></div>
+            <div class="scaffold-box" id="scaffold-sq3b">1, 4, 7, 10, 13, 16, 19, 22 — Pattern 8 = 22
+(or: 3(8) − 2 = 22)</div>
+          </div>
+
+          <div class="qblock" id="block-sq3c">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(c)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq3c">💡 Hint</button></div></div>
+            <p class="qprompt">Write down an expression, in terms of n, for the number of circles in Pattern n.</p>
+            <div class="hint-box" id="hint-sq3c">Find d first, then use n=1 to find c.</div>
+            <div class="formula-row">
+              T<sub>n</sub> = <input type="text" inputmode="numeric" id="sq3c-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="sq3c-c" placeholder="c">
+              <button class="check-btn" data-check="formula" data-qid="sq3c" data-d="3" data-c="-2">Check</button>
+            </div>
+            <div class="feedback" id="fb-sq3c"></div>
+            <div class="scaffold-box" id="scaffold-sq3c">d = 4 − 1 = 3
+n=1, T1=1 → 3(1)+c=1 → c=−2
+Answer: Tn = 3n − 2</div>
+          </div>
+
+          <div class="qblock" id="block-sq3d">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(d)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq3d">💡 Hint</button></div></div>
+            <p class="qprompt">Explain why you cannot make a pattern with exactly 44 circles.</p>
+            <div class="hint-box" id="hint-sq3d">Set 3n − 2 = 44 and solve for n. Is n a whole number?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="sq3d" data-correct="false">Because 44 is an even number</button>
+              <button class="opt-btn" data-qid="sq3d" data-correct="true">Solving 3n − 2 = 44 gives n = 15.33, which isn't a whole number</button>
+              <button class="opt-btn" data-qid="sq3d" data-correct="false">Because the pattern stops at Pattern 10</button>
+            </div>
+            <div class="feedback" id="fb-sq3d"></div>
+            <div class="scaffold-box" id="scaffold-sq3d">3n − 2 = 44 → 3n = 46 → n = 15.33
+Since n must be a whole number, 44 circles is impossible.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12 — FINAL MASTERY CHECK -->
+  <section class="slide light dense" id="s12">
+    <div class="content-wrap">
+      <div class="eyebrow">Final mastery check</div>
+      <h2>Put it all together</h2>
+      <p class="lede">Sequence: 11, 15, 19, 23</p>
+      <div class="qgrid" style="margin-top:1rem;">
+        <div class="qblock" id="block-q10">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q10">💡 Hint</button></div></div>
+          <p class="qprompt">What is the common difference, d?</p>
+          <div class="hint-box" id="hint-q10">Subtract 11 from 15.</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="q10" data-correct="false">3</button>
+            <button class="opt-btn" data-qid="q10" data-correct="true">4</button>
+            <button class="opt-btn" data-qid="q10" data-correct="false">5</button>
+            <button class="opt-btn" data-qid="q10" data-correct="false">11</button>
+          </div>
+          <div class="feedback" id="fb-q10"></div>
+          <div class="scaffold-box" id="scaffold-q10">15 − 11 = 4, 19 − 15 = 4 → d = 4</div>
+        </div>
+
+        <div class="qblock" id="block-q11">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q11">💡 Hint</button></div></div>
+          <p class="qprompt">Find T<sub>n</sub> for this sequence.</p>
+          <div class="hint-box" id="hint-q11">Use the d you just found, then substitute n=1 to find c.</div>
+          <div class="formula-row">
+            T<sub>n</sub> = <input type="text" inputmode="numeric" id="q11-d" placeholder="d"> n + <input type="text" inputmode="numeric" id="q11-c" placeholder="c">
+            <button class="check-btn" data-check="formula" data-qid="q11" data-d="4" data-c="7">Check</button>
+          </div>
+          <div class="feedback" id="fb-q11"></div>
+          <div class="scaffold-box" id="scaffold-q11">Step 1: d = 4
+Step 2: Tn = 4n + c
+Step 3: n=1, T1=11 → 4(1)+c=11 → c=7
+Answer: Tn = 4n + 7</div>
+        </div>
+
+        <div class="qblock" id="block-q12">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><div class="qhead-right"><button class="hint-btn" data-hint-for="q12">💡 Hint</button></div></div>
+          <p class="qprompt">Using T<sub>n</sub> = 4n + 7, what is T<sub>30</sub>?</p>
+          <div class="hint-box" id="hint-q12">Substitute n = 30 into Tn = 4n + 7.</div>
+          <div class="numeric-row">
+            T<sub>30</sub> = <input type="text" inputmode="numeric" id="q12-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="q12" data-ans="127">Check</button>
+          </div>
+          <div class="feedback" id="fb-q12"></div>
+          <div class="scaffold-box" id="scaffold-q12">T30 = 4(30) + 7 = 120 + 7 = 127</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13 — RECAP -->
+  <section class="slide dark" id="s13">
+    <div class="content-wrap">
+      <div class="eyebrow">You did it</div>
+      <h2>You can now crack any number sequence</h2>
+      <div class="score-banner">Your score: <strong id="finalScore">0 / 14</strong></div>
+      <div class="recap-list stagger" id="recapList">
+        <div class="recap-item"><span class="recap-check" data-recap-lo="lo1">–</span> Recognise the pattern in a sequence</div>
+        <div class="recap-item"><span class="recap-check" data-recap-lo="lo2">–</span> Find the general term of a sequence</div>
+        <div class="recap-item"><span class="recap-check" data-recap-lo="lo3">–</span> Simplify the expression to get the nth term</div>
+        <div class="recap-item"><span class="recap-check" data-recap-lo="lo4">–</span> Calculate terms beyond what's given</div>
+        <div class="recap-item"><span class="recap-check" data-recap-lo="lo5">–</span> Apply the nth term to real-world situations</div>
+      </div>
+      <p class="lede">If any topic still feels shaky, scroll back and try it again — or flag it to your teacher so they know exactly where to help.</p>
+      <div class="next-teaser">Next up: quadratic sequences →</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const deck = document.getElementById('deck');
+  const hudCurrent = document.getElementById('hudCurrent');
+  const hudTotal = document.getElementById('hudTotal');
+  const hudFill = document.getElementById('hudFill');
+  const total = slides.length;
+  hudTotal.textContent = String(total).padStart(2,'0');
+
+  function setActiveSlide(index){
+    hudCurrent.textContent = String(index+1).padStart(2,'0');
+    hudFill.style.width = (((index+1)/total)*100) + '%';
+    document.body.classList.toggle('on-dark', slides[index].classList.contains('dark'));
+  }
+
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const idx = slides.indexOf(entry.target);
+      if(entry.isIntersecting && entry.intersectionRatio > 0.55){
+        setActiveSlide(idx);
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { root: deck, threshold: [0.55] });
+  slides.forEach(s => observer.observe(s));
+
+  let current = 0;
+  function goTo(i){ if(i<0||i>=total) return; slides[i].scrollIntoView({behavior:'smooth'}); current = i; }
+  document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+  document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+  window.addEventListener('keydown', (e)=>{
+    if(['ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); goTo(current+1); }
+    if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); goTo(current-1); }
+  });
+  deck.addEventListener('scroll', ()=>{
+    const idx = Math.round(deck.scrollTop / window.innerHeight);
+    current = Math.max(0, Math.min(total-1, idx));
+  });
+
+  /* ---------- Tap-to-reveal (explore cards + big answers) ---------- */
+  document.querySelectorAll('.pattern-card[data-reveal]').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('revealed'));
+  });
+  document.querySelectorAll('.ans[data-reveal]').forEach(ans=>{
+    ans.addEventListener('click', ()=> ans.classList.toggle('shown'));
+  });
+
+  /* ---------- Guided reveal-step demos ---------- */
+  document.querySelectorAll('.reveal-next-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const group = btn.dataset.group;
+      const hidden = document.querySelectorAll(`.rstep.hidden-step[data-group="${group}"]`);
+      if(hidden.length>0){ hidden[0].classList.remove('hidden-step'); }
+      const remaining = document.querySelectorAll(`.rstep.hidden-step[data-group="${group}"]`).length;
+      if(remaining===0){
+        btn.textContent = '✓ All steps shown';
+        btn.disabled = true;
+        const result = document.querySelector(`[data-group="${group}-result"]`);
+        if(result) result.classList.remove('hidden-step');
+      }
+    });
+  });
+
+  /* ---------- Question engine ---------- */
+  const qids = ['q1','q2','q3','q4','q5','q6','q7a','q7b','q8a','q8b','q9','q10','q11','q12',
+    'sq1a','sq1b','sq1c','sq1d','sq2a','sq2b','sq2c','sq2d','sq3a','sq3b','sq3c','sq3d'];
+  const state = {};
+  qids.forEach(id => state[id] = {done:false, attempts:0});
+  const TOTAL = qids.length;
+
+  const loGroups = {
+    lo1: ['q1','q2'],
+    lo2: ['q3','q4','q5'],
+    lo3: ['q3','q4','q5'],
+    lo4: ['q6','q7a','q7b'],
+    lo5: ['q8a','q8b','q9'],
+    exam: ['sq1a','sq1b','sq1c','sq1d','sq2a','sq2b','sq2c','sq2d','sq3a','sq3b','sq3c','sq3d'],
+    final: ['q10','q11','q12']
+  };
+  const loLabels = {
+    lo1: 'LO1 Pattern',
+    lo2: 'LO2 General term',
+    lo3: 'LO3 Simplify',
+    lo4: 'LO4 Beyond',
+    lo5: 'LO5 Real-world',
+    exam: 'Exam-style Qs',
+    final: 'Final check'
+  };
+  const loTargetSlide = { lo1:'s5', lo2:'s6', lo3:'s8', lo4:'s9', lo5:'s10', exam:'s11', final:'s12' };
+
+  const progressPanel = document.getElementById('progressPanel');
+  Object.keys(loGroups).forEach(lo=>{
+    const item = document.createElement('button');
+    item.className = 'progress-item';
+    item.dataset.lo = lo;
+    item.innerHTML = `<span class="dot"></span><span>${loLabels[lo]}</span>`;
+    item.addEventListener('click', ()=> document.getElementById(loTargetSlide[lo]).scrollIntoView({behavior:'smooth'}));
+    progressPanel.appendChild(item);
+  });
+
+  function updateProgress(){
+    let score = 0;
+    Object.values(state).forEach(s=>{ if(s.done) score++; });
+    document.getElementById('scoreDisplay').textContent = score + ' / ' + TOTAL;
+    const finalScoreEl = document.getElementById('finalScore');
+    if(finalScoreEl) finalScoreEl.textContent = score + ' / ' + TOTAL;
+
+    Object.entries(loGroups).forEach(([lo, ids])=>{
+      const allDone = ids.every(q => state[q].done);
+      const el = document.querySelector(`.progress-item[data-lo="${lo}"]`);
+      if(el){ el.classList.toggle('complete', allDone); el.querySelector('.dot').textContent = allDone ? '✓' : ''; }
+      const recapEl = document.querySelector(`.recap-check[data-recap-lo="${lo}"]`);
+      if(recapEl){ recapEl.classList.toggle('done', allDone); recapEl.textContent = allDone ? '✓' : '–'; }
+    });
+  }
+
+  function markDone(qid){
+    if(state[qid].done) return;
+    state[qid].done = true;
+    const block = document.getElementById('block-'+qid);
+    if(block) block.classList.add('solved');
+    updateProgress();
+  }
+  function showHint(qid){ const h = document.getElementById('hint-'+qid); if(h) h.classList.add('show'); }
+  function showScaffold(qid){ const s = document.getElementById('scaffold-'+qid); if(s) s.classList.add('show'); showHint(qid); }
+
+  // manual hint buttons
+  document.querySelectorAll('.hint-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const h = document.getElementById('hint-'+btn.dataset.hintFor);
+      if(h) h.classList.toggle('show');
+    });
+  });
+
+  // MCQ
+  document.querySelectorAll('.opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = btn.dataset.qid;
+      if(!state[qid] || state[qid].done) return;
+      const group = document.querySelectorAll(`.opt-btn[data-qid="${qid}"]`);
+      const fb = document.getElementById('fb-'+qid);
+      if(btn.dataset.correct === 'true'){
+        group.forEach(b => b.disabled = true);
+        btn.classList.add('correct');
+        if(fb){ fb.textContent = '✓ Correct! Well done.'; fb.className = 'feedback good'; }
+        markDone(qid);
+      } else {
+        btn.classList.add('incorrect');
+        state[qid].attempts++;
+        if(fb){
+          fb.textContent = state[qid].attempts === 1 ? 'Not quite — check the hint below and try again.' : "Still not right — here's the full working below.";
+          fb.className = 'feedback bad';
+        }
+        if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+      }
+    });
+  });
+
+  // Formula check (d & c)
+  document.querySelectorAll('[data-check="formula"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = btn.dataset.qid;
+      if(!state[qid] || state[qid].done) return;
+      const dInput = document.getElementById(qid+'-d');
+      const cInput = document.getElementById(qid+'-c');
+      const fb = document.getElementById('fb-'+qid);
+      const dVal = parseInt(dInput.value, 10);
+      const cVal = parseInt(cInput.value, 10);
+      const expD = parseInt(btn.dataset.d, 10);
+      const expC = parseInt(btn.dataset.c, 10);
+      if(isNaN(dVal) || isNaN(cVal)){ fb.textContent = 'Fill in both boxes with a number first.'; fb.className = 'feedback bad'; return; }
+      if(dVal === expD && cVal === expC){
+        fb.textContent = "✓ Correct! That's the simplified nth term."; fb.className = 'feedback good';
+        dInput.disabled = true; cInput.disabled = true; btn.disabled = true;
+        markDone(qid);
+      } else {
+        state[qid].attempts++;
+        if(dVal === expD && cVal !== expC){ fb.textContent = 'Your d is right — check your c (the number you add or subtract).'; }
+        else if(cVal === expC && dVal !== expD){ fb.textContent = 'Your c is right — double-check d, the common difference.'; }
+        else { fb.textContent = state[qid].attempts === 1 ? 'Not quite yet — check the hint below.' : "Here's the full working below."; }
+        fb.className = 'feedback bad';
+        if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+      }
+    });
+  });
+
+  // Numeric check
+  document.querySelectorAll('[data-check="numeric"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const qid = btn.dataset.qid;
+      if(!state[qid] || state[qid].done) return;
+      const input = document.getElementById(qid+'-ans');
+      const fb = document.getElementById('fb-'+qid);
+      const val = parseFloat(input.value);
+      const exp = parseFloat(btn.dataset.ans);
+      if(isNaN(val)){ fb.textContent = 'Type a number first.'; fb.className = 'feedback bad'; return; }
+      if(Math.abs(val - exp) < 0.001){
+        fb.textContent = '✓ Correct!'; fb.className = 'feedback good';
+        input.disabled = true; btn.disabled = true;
+        markDone(qid);
+      } else {
+        state[qid].attempts++;
+        fb.textContent = state[qid].attempts === 1 ? 'Not quite — check the hint below and try again.' : "Here's the full working below.";
+        fb.className = 'feedback bad';
+        if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+      }
+    });
+  });
+
+  // Enter key triggers Check
+  document.querySelectorAll('.formula-row input, .numeric-row input').forEach(inp=>{
+    inp.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const row = inp.closest('.formula-row, .numeric-row');
+        const b = row.querySelector('.check-btn');
+        if(b) b.click();
+      }
+    });
+  });
+
+  updateProgress();
+  setActiveSlide(0);
+</script>
+</body>
+</html>
