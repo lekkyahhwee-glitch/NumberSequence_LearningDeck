@@ -32,6 +32,7 @@
     --fs-body: clamp(0.98rem, 1.1vw, 1.1rem);
     --fs-label: 0.76rem;
     --topbar-h: 56px;
+    --toolbar-h: 46px;
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
@@ -57,7 +58,7 @@
     display:flex;
     flex-direction:column;
     justify-content:center;
-    padding: calc(var(--topbar-h) + 5vh) 7.5vw 6vh 7.5vw;
+    padding: calc(var(--topbar-h) + 5vh) 7.5vw calc(var(--toolbar-h) + 4vh) 7.5vw;
     overflow:hidden;
   }
   .slide.dark{ background:var(--ink); color:var(--paper-on-dark); }
@@ -141,6 +142,48 @@
   .tb-score{
     flex-shrink:0; font-family:var(--font-mono); font-size:0.74rem; font-weight:700; color:var(--mint); white-space:nowrap;
   }
+  .tb-reset-btn{
+    flex-shrink:0; font-family:var(--font-mono); font-size:0.68rem; background:none; border:1px solid var(--line);
+    color:var(--ink); border-radius:20px; padding:0.4rem 0.7rem; cursor:pointer; white-space:nowrap; min-height:36px;
+    touch-action:manipulation;
+  }
+  body.on-dark .tb-reset-btn{ color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .tb-reset-btn:hover{ border-color:var(--coral); color:var(--coral); }
+
+  /* ---------- Persistent math symbol toolbar ---------- */
+  .symbol-toolbar{
+    position:fixed; left:0; right:0; bottom:0; height:var(--toolbar-h); z-index:100;
+    background:var(--paper); border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:0.35rem; padding:0 0.8rem;
+    overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .symbol-toolbar::-webkit-scrollbar{ display:none; }
+  body.on-dark .symbol-toolbar{ background:var(--ink); border-color:var(--line-dark); }
+  .sym-group-label{ font-family:var(--font-mono); font-size:0.68rem; opacity:0.5; flex-shrink:0; white-space:nowrap; }
+  .sym-btn{
+    flex-shrink:0; min-width:32px; min-height:32px; border-radius:6px; border:1px solid var(--line);
+    background:var(--paper-dim); color:var(--ink); font-family:var(--font-mono); font-size:0.85rem;
+    cursor:pointer; touch-action:manipulation;
+  }
+  body.on-dark .sym-btn{ background:rgba(255,255,255,0.06); border-color:var(--line-dark); color:var(--paper-on-dark); }
+  .sym-btn:hover{ border-color:var(--coral); }
+  .sym-btn:active{ background:var(--coral); color:#fff; }
+
+  /* ---------- Laser pointer presentation aid ---------- */
+  .laser-toggle{
+    position:fixed; right:1.5vw; bottom:calc(var(--toolbar-h) + 1.2vh); z-index:110;
+    font-family:var(--font-mono); font-size:0.68rem; background:var(--paper); border:1px solid var(--line);
+    color:var(--ink); border-radius:20px; padding:0.4rem 0.75rem; cursor:pointer; opacity:0.75; touch-action:manipulation;
+  }
+  body.on-dark .laser-toggle{ background:var(--ink); color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .laser-toggle.active{ background:var(--coral); color:#fff; border-color:var(--coral); opacity:1; }
+  .laser-dot{
+    position:fixed; width:22px; height:22px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,101,82,0.9) 0%, rgba(255,101,82,0.35) 60%, rgba(255,101,82,0) 100%);
+    pointer-events:none; z-index:9999; display:none; transform:translate(-50%,-50%);
+  }
+  .laser-dot.on{ display:block; }
+  @media print{ .laser-toggle, .laser-dot, .symbol-toolbar, .top-bar{ display:none !important; } }
 
   @media (max-width: 720px){
     .top-bar{ gap:0.45rem; padding:0 3vw; }
@@ -168,7 +211,7 @@
   /* ---------- Slide 1 : Title ---------- */
   #s1 .stages-row{ display:flex; gap:clamp(1rem,2.6vw,2.4rem); margin-top:clamp(2rem,4vw,3rem); flex-wrap:wrap; }
   .scroll-cue{
-    position:absolute; bottom:4vh; left:7.5vw; font-family:var(--font-mono); font-size:0.78rem; letter-spacing:0.1em;
+    position:absolute; bottom:calc(var(--toolbar-h) + 2vh); left:7.5vw; font-family:var(--font-mono); font-size:0.78rem; letter-spacing:0.1em;
     text-transform:uppercase; opacity:0.7; display:flex; align-items:center; gap:0.5rem;
   }
   .scroll-cue span{ display:inline-block; animation:bob 1.6s ease-in-out infinite; }
@@ -397,6 +440,16 @@
   }
   .score-banner strong{ color:var(--mint); font-size:1.3em; }
   .next-teaser{ font-family:var(--font-mono); font-size:0.82rem; opacity:0.65; margin-top:1rem; }
+
+  .takeaway-card{
+    display:flex; align-items:flex-start; gap:0.9rem; margin-top:1.6rem; max-width:900px;
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:14px; padding:1.1rem 1.4rem;
+  }
+  .dark .takeaway-card{ background:rgba(255,255,255,0.06); border-color:var(--line-dark); }
+  .takeaway-card .tk-icon{ font-size:1.3rem; flex-shrink:0; }
+  .takeaway-card .tk-label{ font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--coral); margin-bottom:0.3rem; }
+  .dark .takeaway-card .tk-label{ color:var(--gold); }
+  .takeaway-card p{ font-size:0.9rem; max-width:none; }
 </style>
 </head>
 <body>
@@ -411,7 +464,47 @@
   </div>
   <div class="tb-chips" id="progressPanel"></div>
   <div class="tb-score">Score: <span id="scoreDisplay">0 / 14</span></div>
+  <button class="tb-reset-btn" id="resetBtn" title="Reset all progress">⟲ Reset</button>
 </div>
+
+<div class="symbol-toolbar" id="symbolToolbar">
+  <span class="sym-group-label">Insert:</span>
+  <button class="sym-btn" data-sym="+">+</button>
+  <button class="sym-btn" data-sym="−">−</button>
+  <button class="sym-btn" data-sym="×">×</button>
+  <button class="sym-btn" data-sym="÷">÷</button>
+  <button class="sym-btn" data-sym="=">=</button>
+  <button class="sym-btn" data-sym="±">±</button>
+  <button class="sym-btn" data-sym="²">x²</button>
+  <button class="sym-btn" data-sym="³">x³</button>
+  <button class="sym-btn" data-sym="^">xⁿ</button>
+  <button class="sym-btn" data-sym="√">√</button>
+  <button class="sym-btn" data-sym="∛">∛</button>
+  <button class="sym-btn" data-sym="π">π</button>
+  <button class="sym-btn" data-sym="θ">θ</button>
+  <button class="sym-btn" data-sym="α">α</button>
+  <button class="sym-btn" data-sym="β">β</button>
+  <button class="sym-btn" data-sym="°">°</button>
+  <button class="sym-btn" data-sym="∠">∠</button>
+  <button class="sym-btn" data-sym="△">△</button>
+  <button class="sym-btn" data-sym="⊥">⊥</button>
+  <button class="sym-btn" data-sym="∥">∥</button>
+  <button class="sym-btn" data-sym="∈">∈</button>
+  <button class="sym-btn" data-sym="∉">∉</button>
+  <button class="sym-btn" data-sym="∪">∪</button>
+  <button class="sym-btn" data-sym="∩">∩</button>
+  <button class="sym-btn" data-sym="≤">≤</button>
+  <button class="sym-btn" data-sym="≥">≥</button>
+  <button class="sym-btn" data-sym="≠">≠</button>
+  <button class="sym-btn" data-sym="∞">∞</button>
+  <button class="sym-btn" data-sym="∑">∑</button>
+  <button class="sym-btn" data-sym="∫">∫</button>
+  <button class="sym-btn" data-sym="x̄">x̄</button>
+  <button class="sym-btn" data-sym="σ">σ</button>
+</div>
+
+<button class="laser-toggle" id="laserToggle" title="Toggle laser pointer">🔴 Laser</button>
+<div class="laser-dot" id="laserDot"></div>
 
 <div class="deck" id="deck">
 
@@ -443,6 +536,8 @@
         <div class="legend-item"><span class="legend-icon">🔁</span><div><strong>Full working shown</strong><p>Get a question wrong twice and we'll show you the steps.</p></div></div>
         <div class="legend-item"><span class="legend-icon">⭐</span><div><strong>Track your progress</strong><p>Your checklist is on the right — tap any topic to jump there.</p></div></div>
         <div class="legend-item"><span class="legend-icon">🧠</span><div><strong>Mistakes are okay</strong><p>You don't need to be right the first time. Keep trying — that's how you learn.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">🏆</span><div><strong>Score counter</strong><p>Your live score sits at the top — it updates as you get questions right.</p></div></div>
+        <div class="legend-item"><span class="legend-icon">🔣</span><div><strong>Symbol toolbar</strong><p>Tap a box to type in it, then use the bar at the bottom to insert maths symbols.</p></div></div>
       </div>
       <div class="pace-note">⏱️ Aim for about 15–20 minutes — but go at your own pace.</div>
 
@@ -576,6 +671,10 @@ Step 3: the common difference d = 4</div>
 Step 2: 20 − 25 = −5 → same difference
 Step 3: d = −5 (negative, because the terms decrease)</div>
         </div>
+      </div>
+      <div class="takeaway-card">
+        <span class="tk-icon">✨</span>
+        <div><div class="tk-label">Takeaway</div><p>Every sequence hides a rule — subtract consecutive terms to find the common difference, d. A positive d means the sequence grows; a negative d means it shrinks.</p></div>
       </div>
     </div>
   </section>
@@ -730,6 +829,10 @@ Step 3: n=1, T1=8 → 7(1)+c=8 → c=1
 Answer: Tn = 7n + 1</div>
         </div>
       </div>
+      <div class="takeaway-card">
+        <span class="tk-icon">✨</span>
+        <div><div class="tk-label">Takeaway</div><p>Every linear sequence can be written as Tn = dn + c. Find d from the common difference, then substitute n=1 to solve for c. That formula works for any position, not just the ones you were given.</p></div>
+      </div>
     </div>
   </section>
 
@@ -785,6 +888,10 @@ Answer: Tn = 4n + 5</div>
           <div class="feedback" id="fb-q7b"></div>
           <div class="scaffold-box" id="scaffold-q7b">T25 = 4(25) + 5 = 100 + 5 = 105</div>
         </div>
+      </div>
+      <div class="takeaway-card">
+        <span class="tk-icon">✨</span>
+        <div><div class="tk-label">Takeaway</div><p>Once you have the formula Tn = dn + c, finding any term — the 10th, the 50th, the 500th — is just one substitution. No listing required.</p></div>
       </div>
     </div>
   </section>
@@ -855,6 +962,10 @@ Answer: Tn = 6n + 2</div>
           <div class="feedback" id="fb-q9"></div>
           <div class="scaffold-box" id="scaffold-q9">Listing every term to find, say, the 100th term would take forever. The formula Tn = dn + c lets us jump straight to any term by substituting its position, n. That's the real power of finding the nth term.</div>
         </div>
+      </div>
+      <div class="takeaway-card">
+        <span class="tk-icon">✨</span>
+        <div><div class="tk-label">Takeaway</div><p>Number sequences aren't just abstract maths — the same dn + c method models real patterns like seating rows, savings, and growth, wherever something changes by a constant amount.</p></div>
       </div>
     </div>
   </section>
@@ -939,16 +1050,16 @@ Answer: Tn = 4n − 3</div>
 
           <div class="qblock" id="block-sq1d">
             <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>(d)</span><div class="qhead-right"><button class="hint-btn" data-hint-for="sq1d">💡 Hint</button></div></div>
-            <p class="qprompt">Explain why you cannot make a pattern with exactly 66 circles.</p>
-            <div class="hint-box" id="hint-sq1d">Set 4n − 3 = 66 and solve for n. Is n a whole number?</div>
+            <p class="qprompt">Explain why you cannot make a pattern with exactly 78 circles.</p>
+            <div class="hint-box" id="hint-sq1d">Set 4n − 3 = 78 and solve for n. Is n a whole number?</div>
             <div class="mcq-options">
-              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 66 is too big a number</button>
-              <button class="opt-btn" data-qid="sq1d" data-correct="true">Solving 4n − 3 = 66 gives n = 17.25, which isn't a whole number</button>
-              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 66 is an odd number</button>
+              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 78 is too big a number</button>
+              <button class="opt-btn" data-qid="sq1d" data-correct="true">Solving 4n − 3 = 78 gives n = 20.25, which isn't a whole number</button>
+              <button class="opt-btn" data-qid="sq1d" data-correct="false">Because 78 is an even number</button>
             </div>
             <div class="feedback" id="fb-sq1d"></div>
-            <div class="scaffold-box" id="scaffold-sq1d">4n − 3 = 66 → 4n = 69 → n = 17.25
-Since n must be a whole number (a pattern position), 66 circles is impossible.</div>
+            <div class="scaffold-box" id="scaffold-sq1d">4n − 3 = 78 → 4n = 81 → n = 20.25
+Since n must be a whole number (a pattern position), 78 circles is impossible.</div>
           </div>
         </div>
       </div>
@@ -1255,6 +1366,16 @@ Answer: Tn = 4n + 7</div>
   });
 
   /* ---------- Question engine ---------- */
+  // Shuffle MCQ option order on every render
+  document.querySelectorAll('.mcq-options').forEach(group=>{
+    const btns = Array.from(group.children);
+    for(let i=btns.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [btns[i],btns[j]] = [btns[j],btns[i]];
+    }
+    btns.forEach(b=>group.appendChild(b));
+  });
+
   const qids = ['q1','q2','q3','q4','q5','q6','q7a','q7b','q8a','q8b','q9','q10','q11','q12',
     'sq1a','sq1b','sq1c','sq1d','sq2a','sq2b','sq2c','sq2d','sq3a','sq3b','sq3c','sq3d'];
   const state = {};
@@ -1313,6 +1434,7 @@ Answer: Tn = 4n + 7</div>
     const block = document.getElementById('block-'+qid);
     if(block) block.classList.add('solved');
     updateProgress();
+    saveProgress();
   }
   function showHint(qid){ const h = document.getElementById('hint-'+qid); if(h) h.classList.add('show'); }
   function showScaffold(qid){ const s = document.getElementById('scaffold-'+qid); if(s) s.classList.add('show'); showHint(qid); }
@@ -1345,6 +1467,7 @@ Answer: Tn = 4n + 7</div>
           fb.className = 'feedback bad';
         }
         if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+        saveProgress();
       }
     });
   });
@@ -1373,6 +1496,7 @@ Answer: Tn = 4n + 7</div>
         else { fb.textContent = state[qid].attempts === 1 ? 'Not quite yet — check the hint below.' : "Here's the full working below."; }
         fb.className = 'feedback bad';
         if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+        saveProgress();
       }
     });
   });
@@ -1396,6 +1520,7 @@ Answer: Tn = 4n + 7</div>
         fb.textContent = state[qid].attempts === 1 ? 'Not quite — check the hint below and try again.' : "Here's the full working below.";
         fb.className = 'feedback bad';
         if(state[qid].attempts === 1){ showHint(qid); } else { showScaffold(qid); }
+        saveProgress();
       }
     });
   });
@@ -1411,6 +1536,110 @@ Answer: Tn = 4n + 7</div>
     });
   });
 
+  // ---------- Persistence (localStorage) ----------
+  const STORAGE_KEY = 'numseq-workbook-progress-v3';
+
+  function saveProgress(){
+    try{
+      const data = { state: {}, inputs: {} };
+      qids.forEach(q => data.state[q] = state[q]);
+      document.querySelectorAll('.formula-row input, .numeric-row input').forEach(inp=>{
+        data.inputs[inp.id] = inp.value;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(e){ /* storage unavailable — fail silently, session still works in-memory */ }
+  }
+
+  function restoreProgress(){
+    let raw;
+    try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){ return; }
+    if(!raw) return;
+    let data;
+    try{ data = JSON.parse(raw); }catch(e){ return; }
+    if(!data || !data.state) return;
+
+    qids.forEach(q=>{
+      if(data.state[q]){
+        state[q].done = !!data.state[q].done;
+        state[q].attempts = data.state[q].attempts || 0;
+      }
+    });
+    if(data.inputs){
+      Object.keys(data.inputs).forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.value = data.inputs[id];
+      });
+    }
+    qids.forEach(q=>{
+      if(state[q].attempts >= 1) showHint(q);
+      if(state[q].attempts >= 2) showScaffold(q);
+      if(state[q].done){
+        const block = document.getElementById('block-'+q);
+        if(block) block.classList.add('solved');
+        const mcqBtns = document.querySelectorAll(`.opt-btn[data-qid="${q}"]`);
+        if(mcqBtns.length){
+          mcqBtns.forEach(b=>{ b.disabled = true; if(b.dataset.correct === 'true') b.classList.add('correct'); });
+        }
+        const row = block ? block.querySelector('.formula-row, .numeric-row') : null;
+        if(row){
+          row.querySelectorAll('input').forEach(i => i.disabled = true);
+          const btn = row.querySelector('.check-btn');
+          if(btn) btn.disabled = true;
+        }
+        const fb = document.getElementById('fb-'+q);
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+      }
+    });
+    updateProgress();
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if(!confirm('Reset all your progress on this workbook? This cannot be undone.')) return;
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    location.reload();
+  });
+
+  // ---------- Laser pointer presentation aid ----------
+  const laserToggle = document.getElementById('laserToggle');
+  const laserDot = document.getElementById('laserDot');
+  let laserOn = false;
+  laserToggle.addEventListener('click', ()=>{
+    laserOn = !laserOn;
+    laserToggle.classList.toggle('active', laserOn);
+    laserDot.classList.toggle('on', laserOn);
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!laserOn) return;
+    laserDot.style.left = e.clientX + 'px';
+    laserDot.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('touchmove', (e)=>{
+    if(!laserOn || !e.touches[0]) return;
+    laserDot.style.left = e.touches[0].clientX + 'px';
+    laserDot.style.top = e.touches[0].clientY + 'px';
+  }, {passive:true});
+
+  // ---------- Persistent math symbol toolbar ----------
+  let lastFocusedInput = null;
+  document.querySelectorAll('.formula-row input, .numeric-row input').forEach(inp=>{
+    inp.addEventListener('focus', ()=> lastFocusedInput = inp);
+    inp.addEventListener('change', saveProgress);
+  });
+  document.querySelectorAll('.sym-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!lastFocusedInput) return;
+      const sym = btn.dataset.sym;
+      const start = lastFocusedInput.selectionStart ?? lastFocusedInput.value.length;
+      const end = lastFocusedInput.selectionEnd ?? lastFocusedInput.value.length;
+      const val = lastFocusedInput.value;
+      lastFocusedInput.value = val.slice(0, start) + sym + val.slice(end);
+      const newPos = start + sym.length;
+      lastFocusedInput.focus();
+      lastFocusedInput.setSelectionRange(newPos, newPos);
+    });
+  });
+
+  restoreProgress();
   updateProgress();
   setActiveSlide(0);
 </script>
