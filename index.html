@@ -185,6 +185,17 @@
   .laser-dot.on{ display:block; }
   @media print{ .laser-toggle, .laser-dot, .symbol-toolbar, .top-bar{ display:none !important; } }
 
+  /* ---------- Confirmation modal (custom — native confirm() can be blocked in embedded iframes) ---------- */
+  .modal-backdrop{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); align-items:center; justify-content:center; z-index:300; padding:1.5rem; }
+  .modal-backdrop.open{ display:flex; }
+  .modal-box{ background:var(--paper); color:var(--ink); border-radius:14px; padding:1.6rem; max-width:380px; width:100%; }
+  .modal-box h3{ font-family:var(--font-display); font-size:1.15rem; margin-bottom:0.6rem; }
+  .modal-box p{ font-size:0.9rem; opacity:0.85; margin-bottom:1.2rem; max-width:none; }
+  .modal-box .row{ display:flex; gap:0.7rem; flex-wrap:wrap; }
+  .modal-box .modal-btn{ font-family:var(--font-mono); font-size:0.82rem; font-weight:600; border-radius:20px; padding:0.6rem 1.1rem; cursor:pointer; min-height:44px; touch-action:manipulation; }
+  .modal-box .modal-btn.confirm{ background:var(--coral); color:#fff; border:none; }
+  .modal-box .modal-btn.cancel{ background:none; border:1px solid var(--line); color:var(--ink); }
+
   @media (max-width: 720px){
     .top-bar{ gap:0.45rem; padding:0 3vw; }
     .tb-counter{ display:none; }
@@ -505,6 +516,17 @@
 
 <button class="laser-toggle" id="laserToggle" title="Toggle laser pointer">🔴 Laser</button>
 <div class="laser-dot" id="laserDot"></div>
+
+<div class="modal-backdrop" id="resetModal">
+  <div class="modal-box">
+    <h3>Reset all your progress?</h3>
+    <p>This clears every answer you've entered on this device. There's no undo.</p>
+    <div class="row">
+      <button class="modal-btn confirm" id="resetConfirmBtn">Yes, reset everything</button>
+      <button class="modal-btn cancel" id="resetCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <div class="deck" id="deck">
 
@@ -1599,8 +1621,14 @@ Answer: Tn = 4n + 7</div>
     updateProgress();
   }
 
+  const resetModal = document.getElementById('resetModal');
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    if(!confirm('Reset all your progress on this workbook? This cannot be undone.')) return;
+    resetModal.classList.add('open');
+  });
+  document.getElementById('resetCancelBtn').addEventListener('click', ()=>{
+    resetModal.classList.remove('open');
+  });
+  document.getElementById('resetConfirmBtn').addEventListener('click', ()=>{
     try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
     location.reload();
   });
