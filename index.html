@@ -1320,13 +1320,19 @@ Answer: Tn = 4n + 7</div>
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       const idx = slides.indexOf(entry.target);
-      if(entry.isIntersecting && entry.intersectionRatio > 0.55){
-        setActiveSlide(idx);
+      if(entry.isIntersecting){
+        // Reveal content as soon as ANY part of the slide is visible — tall slides can never
+        // reach a high intersection ratio, so gating visibility on that would leave them blank.
         entry.target.classList.add('in-view');
+        if(entry.intersectionRatio > 0.5) setActiveSlide(idx);
       }
     });
-  }, { root: deck, threshold: [0.55] });
+  }, { root: deck, threshold: [0, 0.5] });
   slides.forEach(s => observer.observe(s));
+
+  // Safety net: guarantee every slide becomes visible even if the observer above never fires
+  // for some reason (e.g. iframe/embedding quirks). Nothing should stay permanently blank.
+  setTimeout(()=>{ slides.forEach(s => s.classList.add('in-view')); }, 2000);
 
   let current = 0;
   function goTo(i){ if(i<0||i>=total) return; slides[i].scrollIntoView({behavior:'smooth'}); current = i; }
